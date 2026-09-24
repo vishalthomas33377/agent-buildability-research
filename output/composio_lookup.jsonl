@@ -1,0 +1,100 @@
+{"found": true, "slug": "salesforce", "url": "https://composio.dev/toolkits/salesforce", "is_composio_managed": true, "tool_count": 179, "id": 1, "app": "Salesforce", "method": "public_markdown", "slug_tried": "salesforce"}
+{"found": true, "slug": "hubspot", "url": "https://composio.dev/toolkits/hubspot", "is_composio_managed": true, "tool_count": 244, "id": 2, "app": "HubSpot", "method": "public_markdown", "slug_tried": "hubspot"}
+{"found": true, "slug": "pipedrive", "url": "https://composio.dev/toolkits/pipedrive", "is_composio_managed": false, "tool_count": 398, "id": 3, "app": "Pipedrive", "method": "public_markdown", "slug_tried": "pipedrive"}
+{"found": true, "slug": "attio", "url": "https://composio.dev/toolkits/attio", "is_composio_managed": true, "tool_count": 99, "id": 4, "app": "Attio", "method": "public_markdown", "slug_tried": "attio"}
+{"found": true, "slug": "twenty", "url": "https://composio.dev/toolkits/twenty", "is_composio_managed": false, "tool_count": 8, "id": 5, "app": "Twenty", "method": "public_markdown", "slug_tried": "twenty"}
+{"id": 6, "app": "Podio", "found": false, "method": "none", "slug_tried": "podio"}
+{"id": 7, "app": "Zoho CRM", "found": false, "method": "none", "slug_tried": "zoho_crm"}
+{"found": true, "slug": "close", "url": "https://composio.dev/toolkits/close", "is_composio_managed": false, "tool_count": 6, "id": 8, "app": "Close", "method": "public_markdown", "slug_tried": "close"}
+{"id": 9, "app": "Copper", "found": false, "method": "none", "slug_tried": "copper"}
+{"id": 10, "app": "DealCloud", "found": false, "method": "none", "slug_tried": "dealcloud"}
+{"found": true, "slug": "zendesk", "url": "https://composio.dev/toolkits/zendesk", "is_composio_managed": true, "tool_count": 452, "id": 11, "app": "Zendesk", "method": "public_markdown", "slug_tried": "zendesk"}
+{"found": true, "slug": "intercom", "url": "https://composio.dev/toolkits/intercom", "is_composio_managed": true, "tool_count": 133, "id": 12, "app": "Intercom", "method": "public_markdown", "slug_tried": "intercom"}
+{"found": true, "slug": "freshdesk", "url": "https://composio.dev/toolkits/freshdesk", "is_composio_managed": false, "tool_count": 178, "id": 13, "app": "Freshdesk", "method": "public_markdown", "slug_tried": "freshdesk"}
+{"id": 14, "app": "Front", "found": false, "method": "none", "slug_tried": "front"}
+{"id": 15, "app": "Pylon", "found": false, "method": "none", "slug_tried": "pylon"}
+{"id": 16, "app": "LiveAgent", "found": false, "method": "none", "slug_tried": "liveagent"}
+{"found": true, "slug": "plain", "url": "https://composio.dev/toolkits/plain", "is_composio_managed": false, "tool_count": 22, "id": 17, "app": "Plain", "method": "public_markdown", "slug_tried": "plain"}
+{"found": true, "slug": "help_scout", "url": "https://composio.dev/toolkits/help_scout", "is_composio_managed": false, "tool_count": 129, "id": 18, "app": "Help Scout", "method": "public_markdown", "slug_tried": "help_scout"}
+{"found": true, "slug": "gorgias", "url": "https://composio.dev/toolkits/gorgias", "is_composio_managed": true, "tool_count": 32, "id": 19, "app": "Gorgias", "method": "public_markdown", "slug_tried": "gorgias"}
+{"id": 20, "app": "Gladly", "found": false, "method": "none", "slug_tried": "gladly"}
+{"found": true, "slug": "slack", "url": "https://composio.dev/toolkits/slack", "is_composio_managed": true, "tool_count": 145, "id": 21, "app": "Slack", "method": "public_markdown", "slug_tried": "slack"}
+{"id": 22, "app": "Twilio", "found": false, "method": "none", "slug_tried": "twilio"}
+{"id": 23, "app": "Zoho Cliq", "found": false, "method": "none", "slug_tried": "zoho_cliq"}
+{"id": 24, "app": "Lark (Larksuite)", "found": false, "method": "none", "slug_tried": "lark"}
+{"found": true, "slug": "pumble", "url": "https://composio.dev/toolkits/pumble", "is_composio_managed": false, "tool_count": 9, "id": 25, "app": "Pumble", "method": "public_markdown", "slug_tried": "pumble"}
+{"found": true, "slug": "discord", "url": "https://composio.dev/toolkits/discord", "is_composio_managed": true, "tool_count": 27, "id": 26, "app": "Discord", "method": "public_markdown", "slug_tried": "discord"}
+{"found": true, "slug": "telegram", "url": "https://composio.dev/toolkits/telegram", "is_composio_managed": false, "tool_count": 18, "id": 27, "app": "Telegram", "method": "public_markdown", "slug_tried": "telegram"}
+{"id": 28, "app": "WhatsApp Business", "found": false, "method": "none", "slug_tried": "whatsapp_business"}
+{"id": 29, "app": "Aircall", "found": false, "method": "none", "slug_tried": "aircall"}
+{"id": 30, "app": "Vonage", "found": false, "method": "none", "slug_tried": "vonage"}
+{"id": 31, "app": "Google Ads", "found": false, "method": "none", "slug_tried": "google_ads"}
+{"id": 32, "app": "Meta Ads", "found": false, "method": "none", "slug_tried": "meta_ads"}
+{"found": true, "slug": "linkedin_ads", "url": "https://composio.dev/toolkits/linkedin_ads", "is_composio_managed": false, "tool_count": 28, "id": 33, "app": "LinkedIn Ads", "method": "public_markdown", "slug_tried": "linkedin_ads"}
+{"id": 34, "app": "GoHighLevel", "found": false, "method": "none", "slug_tried": "gohighlevel"}
+{"found": true, "slug": "mailchimp", "url": "https://composio.dev/toolkits/mailchimp", "is_composio_managed": true, "tool_count": 272, "id": 35, "app": "Mailchimp", "method": "public_markdown", "slug_tried": "mailchimp"}
+{"found": true, "slug": "klaviyo", "url": "https://composio.dev/toolkits/klaviyo", "is_composio_managed": true, "tool_count": 225, "id": 36, "app": "Klaviyo", "method": "public_markdown", "slug_tried": "klaviyo"}
+{"id": 37, "app": "systeme.io", "found": false, "method": "none", "slug_tried": "systeme_io"}
+{"found": true, "slug": "pinterest", "url": "https://composio.dev/toolkits/pinterest", "is_composio_managed": false, "tool_count": 24, "id": 38, "app": "Pinterest", "method": "public_markdown", "slug_tried": "pinterest"}
+{"id": 39, "app": "Threads (Meta)", "found": false, "method": "none", "slug_tried": "threads"}
+{"found": true, "slug": "sendgrid", "url": "https://composio.dev/toolkits/sendgrid", "is_composio_managed": false, "tool_count": 359, "id": 40, "app": "SendGrid", "method": "public_markdown", "slug_tried": "sendgrid"}
+{"found": true, "slug": "shopify", "url": "https://composio.dev/toolkits/shopify", "is_composio_managed": false, "tool_count": 361, "id": 41, "app": "Shopify", "method": "public_markdown", "slug_tried": "shopify"}
+{"id": 42, "app": "WooCommerce", "found": false, "method": "none", "slug_tried": "woocommerce"}
+{"id": 43, "app": "BigCommerce", "found": false, "method": "none", "slug_tried": "bigcommerce"}
+{"id": 44, "app": "Salesforce Commerce Cloud", "found": false, "method": "none", "slug_tried": "salesforce_commerce_cloud"}
+{"id": 45, "app": "Magento (Adobe Commerce)", "found": false, "method": "none", "slug_tried": "magento"}
+{"id": 46, "app": "Squarespace", "found": false, "method": "none", "slug_tried": "squarespace"}
+{"id": 47, "app": "Ecwid", "found": false, "method": "none", "slug_tried": "ecwid"}
+{"found": true, "slug": "gumroad", "url": "https://composio.dev/toolkits/gumroad", "is_composio_managed": true, "tool_count": 7, "id": 48, "app": "Gumroad", "method": "public_markdown", "slug_tried": "gumroad"}
+{"id": 49, "app": "Amazon Selling Partner", "found": false, "method": "none", "slug_tried": "amazon_selling_partner"}
+{"id": 50, "app": "fanbasis", "found": false, "method": "none", "slug_tried": "fanbasis"}
+{"found": true, "slug": "dataforseo", "url": "https://composio.dev/toolkits/dataforseo", "is_composio_managed": false, "tool_count": 312, "id": 51, "app": "DataForSEO", "method": "public_markdown", "slug_tried": "dataforseo"}
+{"id": 52, "app": "SE Ranking", "found": false, "method": "none", "slug_tried": "se_ranking"}
+{"found": true, "slug": "ahrefs", "url": "https://composio.dev/toolkits/ahrefs", "is_composio_managed": false, "tool_count": 40, "id": 53, "app": "Ahrefs", "method": "public_markdown", "slug_tried": "ahrefs"}
+{"found": true, "slug": "mrscraper", "url": "https://composio.dev/toolkits/mrscraper", "is_composio_managed": false, "tool_count": 11, "id": 54, "app": "MrScraper", "method": "public_markdown", "slug_tried": "mrscraper"}
+{"found": true, "slug": "apify", "url": "https://composio.dev/toolkits/apify", "is_composio_managed": false, "tool_count": 112, "id": 55, "app": "Apify", "method": "public_markdown", "slug_tried": "apify"}
+{"found": true, "slug": "firecrawl", "url": "https://composio.dev/toolkits/firecrawl", "is_composio_managed": false, "tool_count": 29, "id": 56, "app": "Firecrawl", "method": "public_markdown", "slug_tried": "firecrawl"}
+{"id": 57, "app": "Bright Data", "found": false, "method": "none", "slug_tried": "bright_data"}
+{"id": 58, "app": "Sherlock", "found": false, "method": "none", "slug_tried": "sherlock"}
+{"id": 59, "app": "Waterfall.io", "found": false, "method": "none", "slug_tried": "waterfall_io"}
+{"found": true, "slug": "clay", "url": "https://composio.dev/toolkits/clay", "is_composio_managed": false, "tool_count": 6, "id": 60, "app": "Clay", "method": "public_markdown", "slug_tried": "clay"}
+{"found": true, "slug": "github", "url": "https://composio.dev/toolkits/github", "is_composio_managed": true, "tool_count": 846, "id": 61, "app": "GitHub", "method": "public_markdown", "slug_tried": "github"}
+{"found": true, "slug": "vercel", "url": "https://composio.dev/toolkits/vercel", "is_composio_managed": false, "tool_count": 131, "id": 62, "app": "Vercel", "method": "public_markdown", "slug_tried": "vercel"}
+{"id": 63, "app": "Netlify", "found": false, "method": "none", "slug_tried": "netlify"}
+{"found": true, "slug": "cloudflare", "url": "https://composio.dev/toolkits/cloudflare", "is_composio_managed": false, "tool_count": 20, "id": 64, "app": "Cloudflare", "method": "public_markdown", "slug_tried": "cloudflare"}
+{"found": true, "slug": "supabase", "url": "https://composio.dev/toolkits/supabase", "is_composio_managed": true, "tool_count": 116, "id": 65, "app": "Supabase", "method": "public_markdown", "slug_tried": "supabase"}
+{"found": true, "slug": "neo4j", "url": "https://composio.dev/toolkits/neo4j", "is_composio_managed": false, "tool_count": 21, "id": 66, "app": "Neo4j", "method": "public_markdown", "slug_tried": "neo4j"}
+{"found": true, "slug": "snowflake", "url": "https://composio.dev/toolkits/snowflake", "is_composio_managed": false, "tool_count": 14, "id": 67, "app": "Snowflake", "method": "public_markdown", "slug_tried": "snowflake"}
+{"id": 68, "app": "MongoDB Atlas", "found": false, "method": "none", "slug_tried": "mongodb_atlas"}
+{"found": true, "slug": "datadog", "url": "https://composio.dev/toolkits/datadog", "is_composio_managed": false, "tool_count": 42, "id": 69, "app": "Datadog", "method": "public_markdown", "slug_tried": "datadog"}
+{"found": true, "slug": "sentry", "url": "https://composio.dev/toolkits/sentry", "is_composio_managed": false, "tool_count": 205, "id": 70, "app": "Sentry", "method": "public_markdown", "slug_tried": "sentry"}
+{"found": true, "slug": "notion", "url": "https://composio.dev/toolkits/notion", "is_composio_managed": true, "tool_count": 45, "id": 71, "app": "Notion", "method": "public_markdown", "slug_tried": "notion"}
+{"found": true, "slug": "airtable", "url": "https://composio.dev/toolkits/airtable", "is_composio_managed": true, "tool_count": 23, "id": 72, "app": "Airtable", "method": "public_markdown", "slug_tried": "airtable"}
+{"found": true, "slug": "linear", "url": "https://composio.dev/toolkits/linear", "is_composio_managed": true, "tool_count": 32, "id": 73, "app": "Linear", "method": "public_markdown", "slug_tried": "linear"}
+{"found": true, "slug": "jira", "url": "https://composio.dev/toolkits/jira", "is_composio_managed": false, "tool_count": 94, "id": 74, "app": "Jira", "method": "public_markdown", "slug_tried": "jira"}
+{"found": true, "slug": "asana", "url": "https://composio.dev/toolkits/asana", "is_composio_managed": true, "tool_count": 153, "id": 75, "app": "Asana", "method": "public_markdown", "slug_tried": "asana"}
+{"id": 76, "app": "Monday.com", "found": false, "method": "none", "slug_tried": "monday_com"}
+{"found": true, "slug": "clickup", "url": "https://composio.dev/toolkits/clickup", "is_composio_managed": true, "tool_count": 162, "id": 77, "app": "ClickUp", "method": "public_markdown", "slug_tried": "clickup"}
+{"found": true, "slug": "coda", "url": "https://composio.dev/toolkits/coda", "is_composio_managed": false, "tool_count": 109, "id": 78, "app": "Coda", "method": "public_markdown", "slug_tried": "coda"}
+{"id": 79, "app": "Smartsheet", "found": false, "method": "none", "slug_tried": "smartsheet"}
+{"found": true, "slug": "harvest", "url": "https://composio.dev/toolkits/harvest", "is_composio_managed": true, "tool_count": 57, "id": 80, "app": "Harvest", "method": "public_markdown", "slug_tried": "harvest"}
+{"found": true, "slug": "stripe", "url": "https://composio.dev/toolkits/stripe", "is_composio_managed": true, "tool_count": 415, "id": 81, "app": "Stripe", "method": "public_markdown", "slug_tried": "stripe"}
+{"id": 82, "app": "Plaid", "found": false, "method": "none", "slug_tried": "plaid"}
+{"id": 83, "app": "Binance", "found": false, "method": "none", "slug_tried": "binance"}
+{"id": 84, "app": "Paygent Connect", "found": false, "method": "none", "slug_tried": "paygent_connect"}
+{"id": 85, "app": "iPayX", "found": false, "method": "none", "slug_tried": "ipayx"}
+{"found": true, "slug": "quickbooks", "url": "https://composio.dev/toolkits/quickbooks", "is_composio_managed": true, "tool_count": 105, "id": 86, "app": "QuickBooks", "method": "public_markdown", "slug_tried": "quickbooks"}
+{"found": true, "slug": "xero", "url": "https://composio.dev/toolkits/xero", "is_composio_managed": true, "tool_count": 41, "id": 87, "app": "Xero", "method": "public_markdown", "slug_tried": "xero"}
+{"found": true, "slug": "brex", "url": "https://composio.dev/toolkits/brex", "is_composio_managed": false, "tool_count": 84, "id": 88, "app": "Brex", "method": "public_markdown", "slug_tried": "brex"}
+{"found": true, "slug": "ramp", "url": "https://composio.dev/toolkits/ramp", "is_composio_managed": false, "tool_count": 88, "id": 89, "app": "Ramp", "method": "public_markdown", "slug_tried": "ramp"}
+{"id": 90, "app": "PitchBook", "found": false, "method": "none", "slug_tried": "pitchbook"}
+{"id": 91, "app": "NotebookLM", "found": false, "method": "none", "slug_tried": "notebooklm"}
+{"id": 92, "app": "Otter AI", "found": false, "method": "none", "slug_tried": "otter_ai"}
+{"found": true, "slug": "fathom", "url": "https://composio.dev/toolkits/fathom", "is_composio_managed": true, "tool_count": null, "id": 93, "app": "Fathom", "method": "public_markdown", "slug_tried": "fathom"}
+{"found": true, "slug": "consensus", "url": "https://composio.dev/toolkits/consensus", "is_composio_managed": false, "tool_count": 1, "id": 94, "app": "Consensus", "method": "public_markdown", "slug_tried": "consensus"}
+{"id": 95, "app": "Reducto", "found": false, "method": "none", "slug_tried": "reducto"}
+{"id": 96, "app": "Devin", "found": false, "method": "none", "slug_tried": "devin"}
+{"id": 97, "app": "higgsfield", "found": false, "method": "none", "slug_tried": "higgsfield"}
+{"id": 98, "app": "Mermaid CLI", "found": false, "method": "none", "slug_tried": "mermaid_cli"}
+{"found": true, "slug": "youtube_transcript", "url": "https://composio.dev/toolkits/youtube_transcript", "is_composio_managed": false, "tool_count": 9, "id": 99, "app": "YouTube Transcript", "method": "public_markdown", "slug_tried": "youtube_transcript"}
+{"id": 100, "app": "Grain", "found": false, "method": "none", "slug_tried": "grain"}
