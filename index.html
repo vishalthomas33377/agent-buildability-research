@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent-Buildability Research: 100 Apps</title>
+<style>
+  :root {
+    --ink:#16181d; --muted:#6b7280; --line:#e5e7eb; --bg:#fafafa; --card:#ffffff;
+    --good:#0f9d58; --good-bg:#e6f7ee; --mid:#b45309; --mid-bg:#fef3e2;
+    --bad:#c0362c; --bad-bg:#fdecea; --unk:#9ca3af; --unk-bg:#f3f4f6;
+    --accent:#4338ca;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family: -apple-system, "Segoe UI", Inter, Roboto, sans-serif; line-height:1.5; }
+  header { padding:48px 32px 32px; max-width:1100px; margin:0 auto; }
+  header h1 { font-size:2rem; margin:0 0 8px; letter-spacing:-0.02em; }
+  header p.sub { color:var(--muted); font-size:1.05rem; margin:0; max-width:70ch; }
+  main { max-width:1100px; margin:0 auto; padding:0 32px 80px; }
+  section { margin-top:48px; }
+  h2 { font-size:1.3rem; margin:0 0 16px; border-bottom:2px solid var(--ink); padding-bottom:8px; }
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:24px; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; }
+  .stat .num { font-size:2rem; font-weight:700; }
+  .stat .label { color:var(--muted); font-size:0.85rem; }
+  .headline-list { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+  .headline-list li { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:6px; padding:14px 16px; }
+  .cat-row { display:grid; grid-template-columns:220px 1fr 40px; align-items:center; gap:12px; margin-bottom:8px; }
+  .cat-label { font-size:0.9rem; }
+  .cat-count { text-align:right; color:var(--muted); font-size:0.85rem; }
+  .cat-bar { display:flex; height:16px; border-radius:4px; overflow:hidden; background:var(--unk-bg); }
+  .seg { height:100%; }
+  .v-good { background:var(--good); } .v-mid { background:var(--mid); }
+  .v-bad { background:var(--bad); } .v-unknown { background:var(--unk); }
+  .legend { display:flex; gap:16px; font-size:0.8rem; color:var(--muted); margin-top:8px; flex-wrap:wrap; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .dot { width:10px; height:10px; border-radius:2px; display:inline-block; }
+  table { width:100%; border-collapse:collapse; background:var(--card); font-size:0.85rem; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { white-space:normal; }
+  th { position:sticky; top:0; background:var(--card); cursor:pointer; user-select:none; }
+  .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:8px; max-height:640px; overflow-y:auto; }
+  .app-name { font-weight:600; }
+  .verdict-badge { padding:2px 8px; border-radius:999px; font-size:0.75rem; font-weight:600; white-space:nowrap; }
+  .verdict-badge.v-good { background:var(--good-bg); color:var(--good); }
+  .verdict-badge.v-mid { background:var(--mid-bg); color:var(--mid); }
+  .verdict-badge.v-bad { background:var(--bad-bg); color:var(--bad); }
+  .verdict-badge.v-unknown { background:var(--unk-bg); color:var(--unk); }
+  .filters { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .filters select, .filters input { padding:6px 10px; border:1px solid var(--line); border-radius:6px; font-size:0.85rem; }
+  .agent-flow { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
+  .flow-step { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; }
+  .flow-step .n { color:var(--accent); font-weight:700; font-size:0.8rem; }
+  .flow-step h4 { margin:6px 0; }
+  .flow-step p { margin:0; color:var(--muted); font-size:0.88rem; }
+  .method-card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:20px; max-width:900px; }
+  .method-card p { margin:0 0 10px; }
+  .method-card p:last-child { margin-bottom:0; }
+  .method-card ul { margin:0; padding-left:20px; }
+  .method-card li { margin-bottom:8px; }
+  .verify-pass { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:16px; }
+  .verify-delta { background:#eef2ff; border:1px solid #c7d2fe; border-radius:8px; padding:14px 16px; margin-bottom:16px; font-size:0.95rem; }
+  .big-stat { font-size:1.5rem; font-weight:700; margin:6px 0 10px; }
+  .misses ul { margin:8px 0 0; padding-left:20px; font-size:0.88rem; }
+  .misses code { background:var(--unk-bg); padding:1px 5px; border-radius:4px; }
+  .muted { color:var(--muted); }
+  footer { max-width:1100px; margin:0 auto; padding:24px 32px 60px; color:var(--muted); font-size:0.85rem; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Would this app survive an AI agent trying to use it?</h1>
+  <p class="sub">Researching auth, access gating, API surface, and agent-buildability across 100 real
+  SaaS apps — done by an agent, verified by a human, with the misses shown honestly. This page is the
+  whole case study: patterns first, full data below, then how it was built and checked.</p>
+</header>
+<main>
+
+<section id="patterns">
+  <h2>The headline patterns</h2>
+  <div class="stat-grid">
+    <div class="stat"><div class="num">33</div><div class="label">Buildable today / 100</div></div>
+    <div class="stat"><div class="num">20</div><div class="label">Buildable with friction</div></div>
+    <div class="stat"><div class="num">2</div><div class="label">Blocked</div></div>
+    <div class="stat"><div class="num">26.3%</div><div class="label">Use OAuth2</div></div>
+    <div class="stat"><div class="num">39</div><div class="label">Already have an MCP server</div></div>
+    <div class="stat"><div class="num">53</div><div class="label">Already in Composio's catalog</div></div>
+  </div>
+  <ul class="headline-list">
+    <li><strong>Unknown</strong> is the dominant auth method, used by 50/99 apps.</li>
+<li><strong>7.1%</strong> of apps are gated in some way (approval, paid plan, or partnership) rather than fully self-serve.</li>
+<li>The most common blocker is <strong>Lack of any publicly documented API or authentication details.</strong> (7 apps).</li>
+<li><strong>39/99</strong> apps already have a known MCP server; <strong>53/99</strong> are already in Composio's own catalog.</li>
+  </ul>
+</section>
+
+<section id="methodology">
+  <h2>Methodology</h2>
+  <div class="method-card">
+    <p><strong>Scope:</strong> 100 real SaaS applications were evaluated for agent-buildability.</p>
+    <p><strong>Evidence:</strong> The research agent used public web documentation and extracted structured fields for authentication, access model, API surface, MCP availability, and buildability.</p>
+    <p><strong>Verification:</strong> A separate random sample was manually checked against the cited documentation. Material misses are shown rather than hidden.</p>
+    <p><strong>Interpretation:</strong> “Buildable today” means the documented interface appears usable for an agent integration; it does not mean a production-ready integration requires no engineering effort.</p>
+  </div>
+</section>
+
+<section id="by-category">
+  <h2>Buildability by category</h2>
+  
+        <div class="cat-row">
+          <div class="cat-label">AI, Research and Media-native</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:0.0%" title="0 buildable today"></div>
+            <div class="seg v-mid" style="width:60.0%" title="6 buildable with friction"></div>
+            <div class="seg v-bad" style="width:10.0%" title="1 blocked"></div>
+            <div class="seg v-unknown" style="width:30.0%" title="3 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">CRM and Sales</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:40.0%" title="4 buildable today"></div>
+            <div class="seg v-mid" style="width:10.0%" title="1 buildable with friction"></div>
+            <div class="seg v-bad" style="width:0.0%" title="0 blocked"></div>
+            <div class="seg v-unknown" style="width:50.0%" title="5 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">Communications and Messaging</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:50.0%" title="5 buildable today"></div>
+            <div class="seg v-mid" style="width:10.0%" title="1 buildable with friction"></div>
+            <div class="seg v-bad" style="width:0.0%" title="0 blocked"></div>
+            <div class="seg v-unknown" style="width:40.0%" title="4 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">Data, SEO and Scraping</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:22.2%" title="2 buildable today"></div>
+            <div class="seg v-mid" style="width:22.2%" title="2 buildable with friction"></div>
+            <div class="seg v-bad" style="width:0.0%" title="0 blocked"></div>
+            <div class="seg v-unknown" style="width:55.6%" title="5 unknown"></div>
+          </div>
+          <div class="cat-count">9</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">Developer, Infra and Data platforms</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:40.0%" title="4 buildable today"></div>
+            <div class="seg v-mid" style="width:10.0%" title="1 buildable with friction"></div>
+            <div class="seg v-bad" style="width:0.0%" title="0 blocked"></div>
+            <div class="seg v-unknown" style="width:50.0%" title="5 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">Ecommerce</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:20.0%" title="2 buildable today"></div>
+            <div class="seg v-mid" style="width:10.0%" title="1 buildable with friction"></div>
+            <div class="seg v-bad" style="width:0.0%" title="0 blocked"></div>
+            <div class="seg v-unknown" style="width:70.0%" title="7 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">Finance and Fintech</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:30.0%" title="3 buildable today"></div>
+            <div class="seg v-mid" style="width:20.0%" title="2 buildable with friction"></div>
+            <div class="seg v-bad" style="width:0.0%" title="0 blocked"></div>
+            <div class="seg v-unknown" style="width:50.0%" title="5 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">Marketing, Ads, Email and Social</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:30.0%" title="3 buildable today"></div>
+            <div class="seg v-mid" style="width:50.0%" title="5 buildable with friction"></div>
+            <div class="seg v-bad" style="width:10.0%" title="1 blocked"></div>
+            <div class="seg v-unknown" style="width:10.0%" title="1 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">Productivity and Project Management</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:60.0%" title="6 buildable today"></div>
+            <div class="seg v-mid" style="width:0.0%" title="0 buildable with friction"></div>
+            <div class="seg v-bad" style="width:0.0%" title="0 blocked"></div>
+            <div class="seg v-unknown" style="width:40.0%" title="4 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-label">Support and Helpdesk</div>
+          <div class="cat-bar">
+            <div class="seg v-good" style="width:40.0%" title="4 buildable today"></div>
+            <div class="seg v-mid" style="width:10.0%" title="1 buildable with friction"></div>
+            <div class="seg v-bad" style="width:0.0%" title="0 blocked"></div>
+            <div class="seg v-unknown" style="width:50.0%" title="5 unknown"></div>
+          </div>
+          <div class="cat-count">10</div>
+        </div>
+  <div class="legend">
+    <span><span class="dot v-good"></span>Buildable today</span>
+    <span><span class="dot v-mid"></span>Buildable with friction</span>
+    <span><span class="dot v-bad"></span>Blocked</span>
+    <span><span class="dot v-unknown"></span>Unknown</span>
+  </div>
+</section>
+
+<section id="table">
+  <h2>All 100 apps</h2>
+  <div class="filters">
+    <input id="search" type="text" placeholder="Search app name...">
+    <select id="filter-category"><option value="">All categories</option><option value="AI, Research and Media-native">AI, Research and Media-native</option><option value="CRM and Sales">CRM and Sales</option><option value="Communications and Messaging">Communications and Messaging</option><option value="Data, SEO and Scraping">Data, SEO and Scraping</option><option value="Developer, Infra and Data platforms">Developer, Infra and Data platforms</option><option value="Ecommerce">Ecommerce</option><option value="Finance and Fintech">Finance and Fintech</option><option value="Marketing, Ads, Email and Social">Marketing, Ads, Email and Social</option><option value="Productivity and Project Management">Productivity and Project Management</option><option value="Support and Helpdesk">Support and Helpdesk</option></select>
+    <select id="filter-verdict">
+      <option value="">All verdicts</option>
+      <option>Buildable today</option><option>Buildable with friction</option>
+      <option>Blocked</option><option>Unknown</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+  <table id="apps-table">
+    <thead><tr>
+      <th>#</th><th>App</th><th>Category</th><th>What it does</th><th>Auth</th>
+      <th>Access</th><th>API breadth</th><th>MCP exists</th><th>In Composio</th>
+      <th>Verdict</th><th>Blocker</th><th>Evidence</th>
+    </tr></thead>
+    <tbody>
+        <tr data-category="CRM and Sales" data-verdict="Buildable today">
+          <td>1</td>
+          <td class="app-name">Salesforce</td>
+          <td>CRM and Sales</td>
+          <td>Salesforce provides a suite of REST, SOAP, Bulk, and other APIs for programmatic access to CRM data.</td>
+          <td>OAuth2</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developer.salesforce.com/docs/platform/api-rest/guide/quickstart-oauth.html" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Buildable today">
+          <td>2</td>
+          <td class="app-name">HubSpot</td>
+          <td>CRM and Sales</td>
+          <td>HubSpot offers a public REST API suite with OAuth2 authentication and an MCP server for AI integrations.</td>
+          <td>OAuth2, Other</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/overview" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Unknown">
+          <td>3</td>
+          <td class="app-name">Pipedrive</td>
+          <td>CRM and Sales</td>
+          <td></td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No search evidence available to determine API availability or access requirements.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Buildable today">
+          <td>4</td>
+          <td class="app-name">Attio</td>
+          <td>CRM and Sales</td>
+          <td>Attio is a flexible CRM platform with a custom API and an MCP server for AI integrations.</td>
+          <td>OAuth2, Unknown</td>
+          <td>Self-serve (free)</td>
+          <td>Unknown</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://docs.attio.com/mcp/overview" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Unknown">
+          <td>5</td>
+          <td class="app-name">Twenty</td>
+          <td>CRM and Sales</td>
+          <td>Open-source CRM platform</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any publicly documented API or authentication details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Unknown">
+          <td>6</td>
+          <td class="app-name">Podio</td>
+          <td>CRM and Sales</td>
+          <td>Podio is a customizable work platform for teams, often used for CRM and sales workflows.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any publicly documented API or authentication details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Buildable with friction">
+          <td>7</td>
+          <td class="app-name">Zoho CRM</td>
+          <td>CRM and Sales</td>
+          <td>Zoho CRM offers a public V8 REST API with 5,000 daily calls and integrates with Zoho MCP for AI agent access.</td>
+          <td>OAuth2</td>
+          <td>Self-serve (free)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Auth details are not explicitly provided; developers must configure OAuth2 which may require app registration.</td>
+          <td><a href="https://www.zoho.com/en-us/crm/zohocrm-pricing.html" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Buildable today">
+          <td>8</td>
+          <td class="app-name">Close</td>
+          <td>CRM and Sales</td>
+          <td>Close is a CRM platform with a public REST API for automating sales processes.</td>
+          <td>OAuth2, API key, Basic</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developer.close.com/api/overview/api-key-authentication" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Unknown">
+          <td>9</td>
+          <td class="app-name">Copper</td>
+          <td>CRM and Sales</td>
+          <td></td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API documentation or authentication details found in the provided evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="CRM and Sales" data-verdict="Unknown">
+          <td>10</td>
+          <td class="app-name">DealCloud</td>
+          <td>CRM and Sales</td>
+          <td>DealCloud is a relationship-driven CRM and deal management platform for financial services firms.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any publicly documented API or authentication details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Unknown">
+          <td>11</td>
+          <td class="app-name">Zendesk</td>
+          <td>Support and Helpdesk</td>
+          <td>Zendesk is a customer service platform offering ticketing, knowledge base, and chat solutions.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication details found in the supplied evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Unknown">
+          <td>12</td>
+          <td class="app-name">Intercom</td>
+          <td>Support and Helpdesk</td>
+          <td>Intercom provides customer messaging and support platform.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any documented public API or authentication details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Buildable today">
+          <td>13</td>
+          <td class="app-name">Freshdesk</td>
+          <td>Support and Helpdesk</td>
+          <td>Freshdesk provides a public REST API secured with API keys and supports Model Context Protocol (MCP) for AI integrations.</td>
+          <td>API key</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developers.freshdesk.com/api/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Unknown">
+          <td>14</td>
+          <td class="app-name">Front</td>
+          <td>Support and Helpdesk</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication details available in the evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Unknown">
+          <td>15</td>
+          <td class="app-name">Pylon</td>
+          <td>Support and Helpdesk</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or documentation found.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Buildable with friction">
+          <td>16</td>
+          <td class="app-name">LiveAgent</td>
+          <td>Support and Helpdesk</td>
+          <td>LiveAgent provides a RESTful API (v3) for managing tickets, knowledge base, and other helpdesk resources.</td>
+          <td>API key</td>
+          <td>Self-serve (free)</td>
+          <td>Moderate</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>API key can only be generated by an admin/owner account, requiring a trial or paid subscription.</td>
+          <td><a href="https://support.liveagent.com/docs/api/v3/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Buildable today">
+          <td>17</td>
+          <td class="app-name">Plain</td>
+          <td>Support and Helpdesk</td>
+          <td>Plain is an APIâ€‘first support platform offering a GraphQL API and an MCP server for AI tool integration.</td>
+          <td>API key, OAuth2</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://www.plain.com/docs/graphql/introduction" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Unknown">
+          <td>18</td>
+          <td class="app-name">Help Scout</td>
+          <td>Support and Helpdesk</td>
+          <td></td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API documentation or authentication details found in the provided evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Buildable today">
+          <td>19</td>
+          <td class="app-name">Gorgias</td>
+          <td>Support and Helpdesk</td>
+          <td>Gorgias provides a REST API for ticket, customer, and conversation data and supports the Gorgias MCP for AI integrations.</td>
+          <td>API key</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://docs.gorgias.com/en-US/connect-your-ai-assistant-to-the-gorgias-mcp-6310546" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Support and Helpdesk" data-verdict="Buildable today">
+          <td>20</td>
+          <td class="app-name">Gladly</td>
+          <td>Support and Helpdesk</td>
+          <td>Gladly provides a REST API for automating workflows and integrating with thirdâ€‘party services.</td>
+          <td>Basic, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Moderate</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developer.gladly.com/rest/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Buildable today">
+          <td>21</td>
+          <td class="app-name">Slack</td>
+          <td>Communications and Messaging</td>
+          <td>Slack provides a comprehensive REST API for building apps and integrations, with OAuth2 and token authentication, and supports the Model Context Protocol (MCP) for AI agents.</td>
+          <td>OAuth2, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://api.slack.com/apps" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Buildable today">
+          <td>22</td>
+          <td class="app-name">Twilio</td>
+          <td>Communications and Messaging</td>
+          <td>Twilio provides cloud communications APIs for voice, messaging, video, and authentication.</td>
+          <td>API key, Basic</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://www.twilio.com/docs" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Unknown">
+          <td>23</td>
+          <td class="app-name">Zoho Cliq</td>
+          <td>Communications and Messaging</td>
+          <td>Zoho Cliq is a team communication and collaboration platform.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication details found in the provided evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Buildable today">
+          <td>24</td>
+          <td class="app-name">Lark (Larksuite)</td>
+          <td>Communications and Messaging</td>
+          <td>Lark provides a collaborative office platform with a public OpenAPI for messaging, docs, calendar, and more.</td>
+          <td>OAuth2, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://open.larksuite.com/document/home/index?lang=en-US" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Buildable today">
+          <td>25</td>
+          <td class="app-name">Pumble</td>
+          <td>Communications and Messaging</td>
+          <td>Team communication platform with a RESTful API and MCP server for AI integration.</td>
+          <td>API key, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://docs.pumble.com/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Unknown">
+          <td>26</td>
+          <td class="app-name">Discord</td>
+          <td>Communications and Messaging</td>
+          <td>Discord is a voice, video, and text communication platform for communities.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No search evidence provided for API availability, auth, or MCP.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Unknown">
+          <td>27</td>
+          <td class="app-name">Telegram</td>
+          <td>Communications and Messaging</td>
+          <td>Telegram is a cloudâ€‘based instant messaging service.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication details found in the supplied evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Buildable with friction">
+          <td>28</td>
+          <td class="app-name">WhatsApp Business</td>
+          <td>Communications and Messaging</td>
+          <td>WhatsApp Business Platform provides enterpriseâ€‘grade Cloud APIs for messaging, calling and template management.</td>
+          <td>OAuth2</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires business verification, phoneâ€‘number registration and a paid Meta Business plan before the Cloud API can be used.</td>
+          <td><a href="https://developers.facebook.com/documentation/business-messaging/whatsapp/authentication/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Unknown">
+          <td>29</td>
+          <td class="app-name">Aircall</td>
+          <td>Communications and Messaging</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any publicly documented API or authentication details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Communications and Messaging" data-verdict="Buildable today">
+          <td>30</td>
+          <td class="app-name">Vonage</td>
+          <td>Communications and Messaging</td>
+          <td>Vonage provides a suite of communication APIs (voice, messaging, video, etc.) with selfâ€‘serve authentication via API keys, secrets, and JWTs.</td>
+          <td>API key, Basic, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developer.vonage.com/en/documentation" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Buildable with friction">
+          <td>31</td>
+          <td class="app-name">Google Ads</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>Programmatic interface for managing Google Ads accounts and campaigns.</td>
+          <td>OAuth2</td>
+          <td>Gated (approval/allowlist)</td>
+          <td>Unknown</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires approved developer token before API calls can be made.</td>
+          <td><a href="https://developers.google.com/google-ads/api" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Buildable with friction">
+          <td>32</td>
+          <td class="app-name">Meta Ads</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>Programmatic access to Facebook, Instagram, Messenger and WhatsApp ad creation, management and reporting via the Meta Marketing API.</td>
+          <td>OAuth2</td>
+          <td>Gated (approval/allowlist)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires app creation and permission review (advanced access) before full functionality.</td>
+          <td><a href="https://developers.facebook.com/documentation/ads-commerce/marketing-api/get-started/authentication/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Buildable with friction">
+          <td>33</td>
+          <td class="app-name">LinkedIn Ads</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>LinkedIn Ads API lets developers create and manage ad accounts, campaigns, creatives and analytics via REST endpoints.</td>
+          <td>OAuth2</td>
+          <td>Gated (approval/allowlist)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires approved access to the Advertising API program.</td>
+          <td><a href="https://learn.microsoft.com/en-us/linkedin/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Unknown">
+          <td>34</td>
+          <td class="app-name">GoHighLevel</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any publicly documented API or authentication details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Buildable today">
+          <td>35</td>
+          <td class="app-name">Mailchimp</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>Mailchimp provides Marketing and Transactional APIs for sending emails, managing audiences, and automations.</td>
+          <td>API key, OAuth2</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://mailchimp.com/developer/marketing/guides/authentication/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Buildable today">
+          <td>36</td>
+          <td class="app-name">Klaviyo</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>Klaviyo offers RESTful APIs with private key and OAuth authentication for marketing automation.</td>
+          <td>OAuth2, API key</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developers.klaviyo.com/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Blocked">
+          <td>37</td>
+          <td class="app-name">systeme.io</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>Allâ€‘inâ€‘one funnel builder with email, courses, and affiliate tools.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>None</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-bad">Blocked</span></td>
+          <td>No public API or documented authentication method is available; access appears limited to the web UI and an internal MCP server.</td>
+          <td><a href="https://systeme.io/sales-funnels-gg2" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Buildable with friction">
+          <td>38</td>
+          <td class="app-name">Pinterest</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>Pinterest offers a developer platform with RESTful APIs for creators, advertisers, and merchants.</td>
+          <td>OAuth2</td>
+          <td>Gated (approval/allowlist)</td>
+          <td>Unknown</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>API access requires prior approval/allowlist.</td>
+          <td><a href="https://developers.pinterest.com/docs/getting-started/authentication/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Buildable with friction">
+          <td>39</td>
+          <td class="app-name">Threads (Meta)</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>Threads API lets developers create, publish, retrieve, moderate and get insights for Threads content.</td>
+          <td>OAuth2</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Potential need for app review/paid developer plan to obtain publishing permissions.</td>
+          <td><a href="https://developers.facebook.com/documentation/threads/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Marketing, Ads, Email and Social" data-verdict="Buildable today">
+          <td>40</td>
+          <td class="app-name">SendGrid</td>
+          <td>Marketing, Ads, Email and Social</td>
+          <td>SendGrid provides a RESTful email and marketing campaign API with API key authentication.</td>
+          <td>API key</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://ahoy.sendgrid.com/rs/294-TKB-300/images/SendGrid_API_Guide.pdf" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Buildable today">
+          <td>41</td>
+          <td class="app-name">Shopify</td>
+          <td>Ecommerce</td>
+          <td>Shopify provides extensive REST and GraphQL APIs for merchants, apps, and storefronts.</td>
+          <td>OAuth2</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://shopify.dev/docs/api" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Buildable today">
+          <td>42</td>
+          <td class="app-name">WooCommerce</td>
+          <td>Ecommerce</td>
+          <td>WooCommerce provides a REST API for managing store data via JSON over HTTP.</td>
+          <td>API key</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developer.woocommerce.com/docs/apis/rest-api/authentication/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Unknown">
+          <td>43</td>
+          <td class="app-name">BigCommerce</td>
+          <td>Ecommerce</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public documentation or API information available in the provided evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Unknown">
+          <td>44</td>
+          <td class="app-name">Salesforce Commerce Cloud</td>
+          <td>Ecommerce</td>
+          <td>Salesforce Commerce Cloud provides B2C Commerce APIs (SCAPI) for accessing storefront data and functionality.</td>
+          <td>OAuth2</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of clear selfâ€‘serve access details and pricing information for API usage.</td>
+          <td><a href="https://developer.salesforce.com/docs/commerce/commerce-api/guide/authorization.html" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Buildable with friction">
+          <td>45</td>
+          <td class="app-name">Magento (Adobe Commerce)</td>
+          <td>Ecommerce</td>
+          <td>Adobe Commerce (Magento) provides REST and GraphQL web APIs for integration and headless commerce.</td>
+          <td>OAuth1, Token, Other</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires a paid Adobe Commerce license to obtain an instance for API calls.</td>
+          <td><a href="https://developer.adobe.com/commerce/webapi/rest/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Unknown">
+          <td>46</td>
+          <td class="app-name">Squarespace</td>
+          <td>Ecommerce</td>
+          <td>Squarespace is a website building and eâ€‘commerce platform.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any documented public API or authentication details in the provided evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Unknown">
+          <td>47</td>
+          <td class="app-name">Ecwid</td>
+          <td>Ecommerce</td>
+          <td>Ecwid provides an API documented at api-docs.ecwid.com for building integrations.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of concrete details on authentication, access requirements, and API capabilities.</td>
+          <td><a href="https://api-docs.ecwid.com/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Unknown">
+          <td>48</td>
+          <td class="app-name">Gumroad</td>
+          <td>Ecommerce</td>
+          <td>Online platform for creators to sell digital products.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API documentation or authentication details found.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Unknown">
+          <td>49</td>
+          <td class="app-name">Amazon Selling Partner</td>
+          <td>Ecommerce</td>
+          <td>Amazon Selling Partner API provides programmatic access to Amazon seller data.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No search evidence provided to determine API availability or access requirements.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Ecommerce" data-verdict="Unknown">
+          <td>50</td>
+          <td class="app-name">fanbasis</td>
+          <td>Ecommerce</td>
+          <td>FanBasis is a marketplace platform that enables fans to purchase experiences and products from creators.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of documented authentication method and selfâ€‘serve access details.</td>
+          <td><a href="https://dev-docs.fanbasis.com/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Unknown">
+          <td>51</td>
+          <td class="app-name">DataForSEO</td>
+          <td>Data, SEO and Scraping</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public documentation or API information found.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Unknown">
+          <td>52</td>
+          <td class="app-name">SE Ranking</td>
+          <td>Data, SEO and Scraping</td>
+          <td>SE Ranking is an SEO platform offering rank tracking, site audit, and competitor analysis.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API documentation or access details found.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Buildable with friction">
+          <td>53</td>
+          <td class="app-name">Ahrefs</td>
+          <td>Data, SEO and Scraping</td>
+          <td>Ahrefs provides SEO and marketing data via a documented API and an MCP server for AI integrations.</td>
+          <td>API key, OAuth2</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires a paid Ahrefs plan to obtain API keys and use MCP.</td>
+          <td><a href="https://docs.ahrefs.com/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Unknown">
+          <td>54</td>
+          <td class="app-name">MrScraper</td>
+          <td>Data, SEO and Scraping</td>
+          <td></td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public documentation or API information available.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Buildable today">
+          <td>55</td>
+          <td class="app-name">Apify</td>
+          <td>Data, SEO and Scraping</td>
+          <td>Apify provides a RESTful API to run Actors, manage datasets and storage on its platform.</td>
+          <td>Token</td>
+          <td>Self-serve (free)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://docs.apify.com/api/v2" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Unknown">
+          <td>56</td>
+          <td class="app-name">Firecrawl</td>
+          <td>Data, SEO and Scraping</td>
+          <td></td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No search evidence provided for API, auth, or access details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Buildable today">
+          <td>57</td>
+          <td class="app-name">Bright Data</td>
+          <td>Data, SEO and Scraping</td>
+          <td>Web data infrastructure offering proxies, scraping APIs, and an MCP server for realâ€‘time web access.</td>
+          <td>API key, Basic, Token</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://docs.brightdata.com/api-reference/authentication" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Unknown">
+          <td>58</td>
+          <td class="app-name">Sherlock</td>
+          <td>Data, SEO and Scraping</td>
+          <td>Tool to hunt down social media accounts by username across social networks.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Insufficient evidence of a usable public API or authentication mechanism.</td>
+          <td><a href="https://github.com/sherlock-project/api" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Data, SEO and Scraping" data-verdict="Buildable with friction">
+          <td>60</td>
+          <td class="app-name">Clay</td>
+          <td>Data, SEO and Scraping</td>
+          <td>Clay provides a public REST API and an MCP server for programmatic access to its data enrichment and workflow tools.</td>
+          <td>API key</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires a paid Growth plan to obtain an API key.</td>
+          <td><a href="https://developers.clay.com/public-api/authentication" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Buildable today">
+          <td>61</td>
+          <td class="app-name">GitHub</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>GitHub provides a comprehensive REST API for automating repository, issue, and workflow operations.</td>
+          <td>OAuth2, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://docs.github.com/en/rest/authentication/authenticating-to-the-rest-api" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Buildable today">
+          <td>62</td>
+          <td class="app-name">Vercel</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>Vercel provides a REST API for programmatic management of deployments, projects, and teams.</td>
+          <td>Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://vercel.com/docs/rest-api" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Buildable with friction">
+          <td>63</td>
+          <td class="app-name">Netlify</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>Netlify provides a REST API for managing sites, deploys, forms, DNS, and more.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Authentication details and any plan restrictions are not documented in the provided evidence.</td>
+          <td><a href="https://docs.netlify.com/api-and-cli-guides/api-guides/get-started-with-api/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Buildable today">
+          <td>64</td>
+          <td class="app-name">Cloudflare</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>Cloudflare provides REST and GraphQL APIs for managing its services, with selfâ€‘serve API token and key authentication.</td>
+          <td>API key, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developers.cloudflare.com/api/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Buildable today">
+          <td>65</td>
+          <td class="app-name">Supabase</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>Supabase provides a Postgres backend with auto-generated REST APIs, client SDKs, and authentication services.</td>
+          <td>OAuth2, API key</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://supabase.com/docs/guides/auth" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Unknown">
+          <td>66</td>
+          <td class="app-name">Neo4j</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>Neo4j provides a graph database platform with a Model Context Protocol (MCP) server for AI integration.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication details are documented in the provided sources.</td>
+          <td><a href="https://neo4j.com/docs/mcp/current/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Unknown">
+          <td>67</td>
+          <td class="app-name">Snowflake</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>Snowflake is a cloud data platform for data warehousing, analytics, and data sharing.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication details found in the supplied evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Unknown">
+          <td>68</td>
+          <td class="app-name">MongoDB Atlas</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>MongoDB Atlas is a fully managed cloud database service for MongoDB.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No search evidence provided for API availability, auth, or MCP.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Unknown">
+          <td>69</td>
+          <td class="app-name">Datadog</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>Datadog is a monitoring and analytics platform for developers, IT operations teams, and business users.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API documentation or authentication details found in the provided evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Developer, Infra and Data platforms" data-verdict="Unknown">
+          <td>70</td>
+          <td class="app-name">Sentry</td>
+          <td>Developer, Infra and Data platforms</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No search results provided; cannot determine API availability or access requirements.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Buildable today">
+          <td>71</td>
+          <td class="app-name">Notion</td>
+          <td>Productivity and Project Management</td>
+          <td>Notion offers a RESTful API with tokenâ€‘based and OAuth2 authentication for workspace data access.</td>
+          <td>OAuth2, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developers.notion.com/reference/authentication" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Buildable today">
+          <td>72</td>
+          <td class="app-name">Airtable</td>
+          <td>Productivity and Project Management</td>
+          <td>A low-code platform with a public REST API authenticated via bearer tokens.</td>
+          <td>Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://airtable.com/developers/web/api/authentication.md" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Unknown">
+          <td>73</td>
+          <td class="app-name">Linear</td>
+          <td>Productivity and Project Management</td>
+          <td>Linear is a modern issue tracking and project management tool for software teams.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public documentation or search results confirming a usable API or authentication flow.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Buildable today">
+          <td>74</td>
+          <td class="app-name">Jira</td>
+          <td>Productivity and Project Management</td>
+          <td>Jira offers a public REST API for cloud instances with documented authentication methods.</td>
+          <td>Basic, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Buildable today">
+          <td>75</td>
+          <td class="app-name">Asana</td>
+          <td>Productivity and Project Management</td>
+          <td>Asana provides a RESTful API with OAuth2 and personal access tokens, plus an MCP server for AI integrations.</td>
+          <td>OAuth2, Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developers.asana.com/docs/authentication" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Buildable today">
+          <td>76</td>
+          <td class="app-name">Monday.com</td>
+          <td>Productivity and Project Management</td>
+          <td>Monday.com offers a GraphQL Platform API with personal API tokens and a hosted MCP server for data access.</td>
+          <td>Token</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developer.monday.com/api-reference/docs/authentication" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Unknown">
+          <td>77</td>
+          <td class="app-name">ClickUp</td>
+          <td>Productivity and Project Management</td>
+          <td>ClickUp is a productivity platform for project management and collaboration.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API documentation or authentication details found in the provided evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Unknown">
+          <td>78</td>
+          <td class="app-name">Coda</td>
+          <td>Productivity and Project Management</td>
+          <td>Coda is a doc platform that blends documents, spreadsheets, and apps into a single flexible workspace.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication details found in the provided evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Buildable today">
+          <td>79</td>
+          <td class="app-name">Smartsheet</td>
+          <td>Productivity and Project Management</td>
+          <td>Smartsheet offers a RESTful API secured with bearer access tokens for programmatic access to sheets, reports, and other resources.</td>
+          <td>Token</td>
+          <td>Self-serve (free)</td>
+          <td>Unknown</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developers.smartsheet.com/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Productivity and Project Management" data-verdict="Unknown">
+          <td>80</td>
+          <td class="app-name">Harvest</td>
+          <td>Productivity and Project Management</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No searchable evidence of a public API, authentication, or integration details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Buildable today">
+          <td>81</td>
+          <td class="app-name">Stripe</td>
+          <td>Finance and Fintech</td>
+          <td>Stripe provides a comprehensive REST API for payments, billing, subscriptions, payouts, and financial workflows.</td>
+          <td>API key, OAuth2</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://docs.stripe.com/api/authentication" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Unknown">
+          <td>82</td>
+          <td class="app-name">Plaid</td>
+          <td>Finance and Fintech</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No search evidence provided for Plaid's API, auth, or MCP details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Buildable today">
+          <td>83</td>
+          <td class="app-name">Binance</td>
+          <td>Finance and Fintech</td>
+          <td>Binance provides a public REST API for market data and account operations, secured with API keys.</td>
+          <td>API key</td>
+          <td>Self-serve (free)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://binance-docs.github.io/apiAgent-API-EN/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Unknown">
+          <td>84</td>
+          <td class="app-name">Paygent Connect</td>
+          <td>Finance and Fintech</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public information about API or access details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Buildable with friction">
+          <td>85</td>
+          <td class="app-name">iPayX</td>
+          <td>Finance and Fintech</td>
+          <td>Forensic FX audit engine with REST API and MCP server for AI agents.</td>
+          <td>API key, Token</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Paid plan required for API access</td>
+          <td><a href="https://www.ipayx.ai/docs/mcp-server?lang=en" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Unknown">
+          <td>86</td>
+          <td class="app-name">QuickBooks</td>
+          <td>Finance and Fintech</td>
+          <td></td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication information found in the supplied evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Unknown">
+          <td>87</td>
+          <td class="app-name">Xero</td>
+          <td>Finance and Fintech</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public API or authentication information found in the supplied evidence.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Buildable today">
+          <td>88</td>
+          <td class="app-name">Brex</td>
+          <td>Finance and Fintech</td>
+          <td>Brex provides a developer API for accessing financial data such as accounts and cards.</td>
+          <td>Token</td>
+          <td>Self-serve (free)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-good">Buildable today</span></td>
+          <td></td>
+          <td><a href="https://developer.brex.com/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Unknown">
+          <td>89</td>
+          <td class="app-name">Ramp</td>
+          <td>Finance and Fintech</td>
+          <td></td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>No public documentation or API information found.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="Finance and Fintech" data-verdict="Buildable with friction">
+          <td>90</td>
+          <td class="app-name">PitchBook</td>
+          <td>Finance and Fintech</td>
+          <td>PitchBook offers a data API for onâ€‘demand private market information, but access requires a separate contract and sales approval.</td>
+          <td>Unknown</td>
+          <td>Gated (approval/allowlist)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Access requires a separate contract and sales approval; no selfâ€‘serve onboarding.</td>
+          <td><a href="https://pitchbook.com/help/PitchBook-api" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Buildable with friction">
+          <td>91</td>
+          <td class="app-name">NotebookLM</td>
+          <td>AI, Research and Media-native</td>
+          <td>Gemini Notebook Enterprise (formerly NotebookLM Enterprise) provides API-driven notebook creation, data source management, and AI-powered insights on Google Cloud.</td>
+          <td>OAuth2</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Moderate</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Enterprise licensing / paid plan required to access the API.</td>
+          <td><a href="https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Buildable with friction">
+          <td>92</td>
+          <td class="app-name">Otter AI</td>
+          <td>AI, Research and Media-native</td>
+          <td>Otter AI provides a public API for accessing conversations, transcripts, and insights, primarily for Enterprise customers.</td>
+          <td>Unknown</td>
+          <td>Gated (partnership/contact-sales)</td>
+          <td>Broad</td>
+          <td>✓</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>API access requires sales/enterprise approval; no selfâ€‘serve signâ€‘up.</td>
+          <td><a href="https://help.otter.ai/hc/en-us/articles/35287607569687-Otter-MCP-Server" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Buildable with friction">
+          <td>93</td>
+          <td class="app-name">Fathom</td>
+          <td>AI, Research and Media-native</td>
+          <td>Meeting recording and summarization platform with a public API and Model Context Protocol (MCP) integration.</td>
+          <td>OAuth2</td>
+          <td>Gated (approval/allowlist)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>OAuth app registration requires partner approval/allowlist.</td>
+          <td><a href="https://help.fathom.video/en/articles/8368641" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Buildable with friction">
+          <td>94</td>
+          <td class="app-name">Consensus</td>
+          <td>AI, Research and Media-native</td>
+          <td>AI-powered search over 200M+ peerâ€‘reviewed academic papers with API and MCP access.</td>
+          <td>Unknown</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires a paid subscription tier to obtain API/MCP call quota.</td>
+          <td><a href="https://docs.consensus.app/api-plans-and-access" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Unknown">
+          <td>95</td>
+          <td class="app-name">Reducto</td>
+          <td>AI, Research and Media-native</td>
+          <td>Reducto is a document parsing AI platform (reducto.ai).</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any publicly documented API or authentication details.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Unknown">
+          <td>96</td>
+          <td class="app-name">Devin</td>
+          <td>AI, Research and Media-native</td>
+          <td></td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any publicly available API or authentication documentation.</td>
+          <td>—</td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Buildable with friction">
+          <td>97</td>
+          <td class="app-name">higgsfield</td>
+          <td>AI, Research and Media-native</td>
+          <td>Generative video and image models accessed via a public REST API.</td>
+          <td>API key</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Broad</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Requires a paid API plan to obtain credentials.</td>
+          <td><a href="https://docs.higgsfield.ai/docs/authentication" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Blocked">
+          <td>98</td>
+          <td class="app-name">Mermaid CLI</td>
+          <td>AI, Research and Media-native</td>
+          <td>Command-line interface for generating diagrams from Mermaid definitions.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>None</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-bad">Blocked</span></td>
+          <td>Mermaid CLI is a local commandâ€‘line tool with no public API, making integration impossible.</td>
+          <td><a href="https://github.com/mermaid-js/mermaid-cli" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Buildable with friction">
+          <td>99</td>
+          <td class="app-name">YouTube Transcript</td>
+          <td>AI, Research and Media-native</td>
+          <td>Fetch YouTube video transcripts, search videos, and browse channels/playlists via a REST API.</td>
+          <td>API key</td>
+          <td>Self-serve (paid plan required)</td>
+          <td>Moderate</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td><span class="verdict-badge v-mid">Buildable with friction</span></td>
+          <td>Paid plan required to access transcript endpoint.</td>
+          <td><a href="https://transcriptapi.com/docs/api/" target="_blank" rel="noopener">source</a></td>
+        </tr>
+
+        <tr data-category="AI, Research and Media-native" data-verdict="Unknown">
+          <td>100</td>
+          <td class="app-name">Grain</td>
+          <td>AI, Research and Media-native</td>
+          <td>Grain is a meeting notes platform that captures and organizes video meeting content.</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>Unknown</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="verdict-badge v-unknown">Unknown</span></td>
+          <td>Lack of any publicly documented API or authentication details.</td>
+          <td>—</td>
+        </tr></tbody>
+  </table>
+  </div>
+</section>
+
+<section id="agent">
+  <h2>How the research agent works</h2>
+  <div class="agent-flow">
+    <div class="flow-step"><div class="n">STEP 1</div><h4>Seed list</h4>
+      <p>100 apps loaded from data/apps.json with category + name hint.</p></div>
+    <div class="flow-step"><div class="n">STEP 2</div><h4>Agent research</h4>
+      <p>DDGS web search gathers current public evidence, then a Groq-hosted LLM
+      extracts structured JSON: auth, access model, API surface, verdict, and evidence URLs.</p></div>
+    <div class="flow-step"><div class="n">STEP 3</div><h4>Composio cross-check</h4>
+      <p>Each app is checked against Composio's own toolkit catalog via their SDK/public
+      catalog — a second, independent signal on buildability.</p></div>
+    <div class="flow-step"><div class="n">STEP 4</div><h4>Human verification</h4>
+      <p>A random sample is manually checked against real docs; misses are logged and
+      the agent's prompt is tightened for a second pass.</p></div>
+  </div>
+  <p style="margin-top:16px;" class="muted">Where a human was needed: judgment calls on ambiguous
+  gating language (e.g. "request access" pages that are actually near-instant vs. genuinely
+  sales-gated), apps with renamed/rebranded docs the search missed, and final sign-off on every
+  "Blocked" verdict before treating it as a finding rather than a search miss.</p>
+</section>
+
+<section id="verification">
+  <h2>Human Verification &amp; Error Analysis</h2>
+  <p class="muted">Verification is a sampled audit of the agent's research, not a claim that every row was manually checked.</p>
+  
+        <div class="verify-pass">
+          <h3>pass_2</h3>
+          <div class="big-stat">10/20 <span class="muted">apps correct (50.0%)</span></div>
+          <div class='misses'><strong>Misses:</strong><ul><li>[63] Netlify — wrong fields: <code>auth_methods, self_serve, existing_mcp, verdict</code>; corrections: {'auth_methods': ['OAuth2', 'Token'], 'self_serve': 'Self-serve (free)', 'existing_mcp': True, 'verdict': 'Buildable today'}</li><li>[79] Smartsheet — wrong fields: <code>auth_methods, self_serve, verdict</code>; corrections: {'auth_methods': ['Token', 'OAuth2'], 'self_serve': 'Gated (paid plan)', 'verdict': 'Buildable with friction'}</li><li>[80] Harvest — wrong fields: <code>auth_methods, self_serve, has_public_api, api_style, api_breadth, verdict</code>; corrections: {'auth_methods': ['Token', 'OAuth2'], 'self_serve': 'Self-serve (free)', 'has_public_api': True, 'api_style': 'REST', 'api_breadth': 'Broad', 'verdict': 'Buildable today'}</li><li>[95] Reducto — wrong fields: <code>auth_methods, self_serve, has_public_api, api_style, api_breadth, existing_mcp, verdict</code>; corrections: {'auth_methods': ['Token'], 'self_serve': 'Self-serve (free)', 'has_public_api': True, 'api_style': 'REST', 'api_breadth': 'Broad', 'existing_mcp': True, 'verdict': 'Buildable today'}</li><li>[5] Twenty — wrong fields: <code>auth_methods, self_serve, has_public_api, api_style, api_breadth, existing_mcp, verdict</code>; corrections: {'auth_methods': ['Token'], 'self_serve': 'Self-serve (free)', 'has_public_api': True, 'api_style': 'REST and GraphQL', 'api_breadth': 'Broad', 'existing_mcp': True, 'verdict': 'Buildable today'}</li><li>[72] Airtable — wrong fields: <code>auth_methods</code>; corrections: {'auth_methods': ['Token', 'OAuth2']}</li><li>[100] Grain — wrong fields: <code>auth_methods, self_serve, has_public_api, api_style, api_breadth, existing_mcp, verdict</code>; corrections: {'auth_methods': ['Token', 'OAuth2'], 'self_serve': 'Self-serve (free)', 'has_public_api': True, 'api_style': 'REST', 'api_breadth': 'Moderate', 'existing_mcp': True, 'verdict': 'Buildable today'}</li><li>[66] Neo4j — wrong fields: <code>auth_methods, has_public_api, api_style, api_breadth, verdict</code>; corrections: {'auth_methods': ['OAuth2', 'Basic', 'Token'], 'has_public_api': True, 'api_style': 'REST', 'api_breadth': 'Moderate', 'verdict': 'Buildable with friction'}</li><li>[3] Pipedrive — wrong fields: <code>auth_methods, self_serve, has_public_api, api_style, api_breadth, existing_mcp, verdict</code>; corrections: {'auth_methods': ['Token', 'OAuth2'], 'self_serve': 'Self-serve (free)', 'has_public_api': True, 'api_style': 'REST', 'api_breadth': 'Broad', 'existing_mcp': True, 'verdict': 'Buildable today'}</li><li>[76] Monday.com — wrong fields: <code>auth_methods</code>; corrections: {'auth_methods': ['Token', 'OAuth2']}</li></ul></div>
+        </div>
+</section>
+
+<section id="limitations">
+  <h2>Limitations</h2>
+  <div class="method-card">
+    <ul>
+      <li>SaaS documentation and MCP availability can change over time.</li>
+      <li>Search-based research can miss poorly indexed, renamed, or gated documentation.</li>
+      <li>API availability and free-plan availability are separate questions; an API may exist while access is paid or restricted.</li>
+      <li>The manual audit covers a sample rather than every one of the 100 applications.</li>
+      <li>“Unknown” is retained when the available evidence is insufficient rather than being inferred.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+<footer>
+  Built for the Composio AI Product Ops take-home. Source: see repo README for how to re-run the
+  agent, the verification loop, and this report generator.
+</footer>
+<script>
+  const search = document.getElementById('search');
+  const catFilter = document.getElementById('filter-category');
+  const verdictFilter = document.getElementById('filter-verdict');
+  const rows = Array.from(document.querySelectorAll('#apps-table tbody tr'));
+  function applyFilters() {
+    const q = search.value.toLowerCase();
+    const cat = catFilter.value;
+    const verdict = verdictFilter.value;
+    rows.forEach(r => {
+      const name = r.querySelector('.app-name').textContent.toLowerCase();
+      const rowCat = r.dataset.category;
+      const rowVerdict = r.dataset.verdict;
+      const show = name.includes(q) && (!cat || cat === rowCat) && (!verdict || verdict === rowVerdict);
+      r.style.display = show ? '' : 'none';
+    });
+  }
+  [search, catFilter, verdictFilter].forEach(el => el.addEventListener('input', applyFilters));
+</script>
+</body>
+</html>
