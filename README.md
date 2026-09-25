@@ -1,5 +1,5 @@
 # Agent-Buildability Research: 100 Apps
-
+👉 [View the live case study](https://vishalthomas33377.github.io/agent-buildability-research/)
 Researches whether 100 real SaaS apps could be wrapped as AI-agent toolkits today —
 auth method, self-serve vs. gated access, API surface, and a buildability verdict per
 app — using an LLM research agent (Claude + web search) cross-checked against
